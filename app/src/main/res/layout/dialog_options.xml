@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imvHeart"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            android:src="@drawable/ic_heart"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/imvHaha"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:src="@drawable/ic_haha"
+            android:id="@+id/imvHaha"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/imvWow"
+            app:layout_constraintStart_toEndOf="@id/imvHeart"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:src="@drawable/ic_wow"
+            android:id="@+id/imvWow"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/imvSad"
+            app:layout_constraintStart_toEndOf="@+id/imvHaha"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:src="@drawable/ic_sad"
+            android:id="@+id/imvSad"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/imvAngry"
+            app:layout_constraintStart_toEndOf="@+id/imvWow"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:src="@drawable/ic_angry"
+            android:id="@+id/imvAngry"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/imvLike"
+            app:layout_constraintStart_toEndOf="@+id/imvSad"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:src="@drawable/ic_like"
+            android:id="@+id/imvLike"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/imvDisLike"
+            app:layout_constraintStart_toEndOf="@+id/imvAngry"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:src="@drawable/ic_dislike"
+            android:id="@+id/imvDisLike"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imvLike"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <View
+        android:layout_marginTop="4dp"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+    <TextView
+        android:id="@+id/tvCopy"
+        android:padding="20dp"
+        android:textSize="20dp"
+        android:layout_marginLeft="4dp"
+        android:text="Copy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <View
+        android:layout_marginTop="4dp"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+    <TextView
+        android:id="@+id/tvReply"
+        android:padding="20dp"
+        android:textSize="20dp"
+        android:layout_marginLeft="4dp"
+        android:text="Reply"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

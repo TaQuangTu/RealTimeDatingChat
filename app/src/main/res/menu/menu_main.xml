@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="Reload" android:icon="@drawable/ic_reload" app:showAsAction="ifRoom" android:id="@+id/itemReload"></item>
+    <item android:title="Camera" android:id="@+id/itemCam" android:icon="@drawable/ic_cam" app:showAsAction="ifRoom"/>
+    <item android:title="Log out" android:id="@+id/itemLogout"></item>
+    <item android:title="Delete old files" android:icon="@drawable/ic_delete">
+        <menu>
+            <item android:title="Old messages" android:id="@+id/itemDeleteMessages"></item>
+            <item android:title="Old images" android:id="@+id/itemDeleteImages"></item>
+
+        </menu>
+    </item>
+</menu>

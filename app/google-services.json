@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "994011676067",
+    "firebase_url": "https://forus-bf364.firebaseio.com",
+    "project_id": "forus-bf364",
+    "storage_bucket": "forus-bf364.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994011676067:android:a2107f255d0058ffebee16",
+        "android_client_info": {
+          "package_name": "com.taquangtu.forus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "994011676067-1bk7l80ablk8p46nrf6gfg1h8b6n2abu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.taquangtu.forus",
+            "certificate_hash": "84a08527a17ab38e65f97a74d9b624f215d270ac"
+          }
+        },
+        {
+          "client_id": "994011676067-1868a59u8dkbct832kd53lvnvbl2lian.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAXxEJTQf1pRAWILBmxcKva9JymTOvMVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "994011676067-1868a59u8dkbct832kd53lvnvbl2lian.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
