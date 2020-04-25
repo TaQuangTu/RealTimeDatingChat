@@ -32,9 +32,7 @@ class LoginViewModel : BaseViewModel() {
         val checkpoint = ForUsApplication.context.getSharedPreferences("user", Context.MODE_PRIVATE)
         val editor = checkpoint.edit()
         AppContext.userId = pass
-        if (pass.equals("tunhi") || pass.equals("nhitu")) {
-            AppContext.roomId = "999999"
-        } else if (pass.equals("test1") || pass.equals("test2")) {
+        if (pass.equals("test1") || pass.equals("test2")) {
             AppContext.roomId = "0"
         } else {
             AppContext.roomId = Random.nextInt(1, 50).toString()
