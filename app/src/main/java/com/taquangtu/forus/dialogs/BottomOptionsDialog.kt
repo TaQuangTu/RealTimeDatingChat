@@ -6,10 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.taquangtu.forus.R
-import com.taquangtu.forus.models.Message.Companion
 import com.taquangtu.forus.models.Message.Companion.REACTION_ANGRY
 import com.taquangtu.forus.models.Message.Companion.REACTION_DIS_LIKE
 import com.taquangtu.forus.models.Message.Companion.REACTION_HAHA

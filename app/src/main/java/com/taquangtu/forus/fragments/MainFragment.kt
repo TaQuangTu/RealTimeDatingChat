@@ -15,18 +15,17 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.taquangtu.forus.contexts.AppContext
-import com.taquangtu.forus.contexts.ForUsApplication
 import com.taquangtu.forus.R
 import com.taquangtu.forus.activities.LoginActivity
 import com.taquangtu.forus.adapters.MessageAdapter
 import com.taquangtu.forus.base.BaseFragment
+import com.taquangtu.forus.contexts.AppContext
+import com.taquangtu.forus.contexts.ForUsApplication
 import com.taquangtu.forus.dialogs.BottomOptionsDialog
 import com.taquangtu.forus.interfaces.ItemSelectionListener
 import com.taquangtu.forus.models.Message
@@ -35,7 +34,7 @@ import com.taquangtu.forus.viewmodels.LoginViewModel
 import com.taquangtu.forus.viewmodels.MainViewModel
 import kotlinx.android.synthetic.main.main_fragment.*
 
-
+//use MVVM architecture
 class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener<Message>,
     BottomOptionsDialog.OnOptionSelection {
     lateinit var mBtnSend: Button
@@ -46,14 +45,13 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
     lateinit var mCstReply: ConstraintLayout
     lateinit var mTvReply: TextView
     lateinit var mImvCloseReply: ImageView
-    val optionsDialog = BottomOptionsDialog()
+    val mOptionsDialog = BottomOptionsDialog()
+    private lateinit var mViewModel: MainViewModel
 
     companion object {
         fun newInstance() = MainFragment()
         val PICK_IMAGE_MULTIPLE = 1
     }
-
-    private lateinit var viewModel: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,16 +64,17 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         mapViews()
-        optionsDialog.listener = this
+        mOptionsDialog.listener = this
     }
 
     override fun onResume() {
         super.onResume()
         AppContext.appIsVisible = true
+        (mRcvMessages.adapter as MessageAdapter).setData(mViewModel.mLiveMessList.value)
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
         AppContext.appIsVisible = false
     }
 
@@ -88,7 +87,7 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
         if (item.itemId == R.id.itemReload) {
             // mSrlContainer.isRefreshing = true
             (mRcvMessages.adapter as MessageAdapter).setData(ArrayList())
-            viewModel.loadMessages(false)
+            mViewModel.loadMessages(false)
             removeTempInstances()
         } else if (item.itemId == R.id.itemCam) {
             val intent = Intent()
@@ -100,10 +99,10 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
                 PICK_IMAGE_MULTIPLE
             )
         } else if (item.itemId == R.id.itemDeleteImages) {
-            viewModel.deleteOldImages()
+            mViewModel.deleteOldImages()
             (rcvMessages.adapter as MessageAdapter).setData(ArrayList())
         } else if (item.itemId == R.id.itemDeleteMessages) {
-            viewModel.deleteOldMessages()
+            mViewModel.deleteOldMessages()
             (rcvMessages.adapter as MessageAdapter).setData(ArrayList())
         } else if (item.itemId == R.id.itemLogout) {
             LoginViewModel.logout()
@@ -122,17 +121,16 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
 
                 if (data!!.data != null) {
                     val mImageUri: Uri? = data.data
-                    viewModel.sendImage(mImageUri)
+                    mViewModel.sendImage(mImageUri)
                 }
             } else {
                 if (data!!.clipData != null) {
-                    val mClipData = data!!.clipData;
-                    val mArrayUri = ArrayList<Uri>();
+                    val mClipData = data!!.clipData
                     for (i in 0 until mClipData!!.itemCount) {
 
                         val item = mClipData.getItemAt(i)
                         val uri = item.uri
-                        viewModel.sendImage(uri)
+                        mViewModel.sendImage(uri)
                     }
                 }
             }
@@ -151,7 +149,7 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
         mSrlContainer.isEnabled = true;
         mSrlContainer.setOnRefreshListener(object : SwipeRefreshLayout.OnRefreshListener {
             override fun onRefresh() {
-                viewModel.loadMessages(true)
+                mViewModel.loadMessages(true)
                 removeTempInstances()
             }
         })
@@ -167,7 +165,8 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        activity!!.window.setBackgroundDrawableResource(R.drawable.bg)
+        mViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         setUpViewModels()
         setUpRecyclerView()
         ForUsApplication.context.startService(Intent(context, ListenMessageService::class.java))
@@ -181,10 +180,8 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
     }
 
     private fun setUpViewModels() {
-        viewModel.loadMessages(false)
-        viewModel.listenNewMess()
-        viewModel.listenItemChange()
-        viewModel.liveData.observe(viewLifecycleOwner, Observer { t ->
+        mViewModel.listenNewMess()
+        mViewModel.mLiveMessList.observe(viewLifecycleOwner, Observer { t ->
             mSrlContainer.isRefreshing = false
             if (t == null) {
                 toast("No messages")
@@ -193,21 +190,21 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
                 mRcvMessages.scrollToPosition((mRcvMessages.adapter as MessageAdapter).itemCount - 1)
             }
         })
-        viewModel.liveNewMess.observe(viewLifecycleOwner, Observer { message ->
+        mViewModel.mLiveNewMess.observe(activity!!, Observer { message ->
             mSrlContainer.isRefreshing = false
             newMessCome(message)
         })
-        viewModel.liveItemChange.observe(viewLifecycleOwner, Observer { message ->
+        mViewModel.mLiveItemChange.observe(activity!!, Observer { message ->
             val adapter = (mRcvMessages.adapter as MessageAdapter)
             val messages = adapter.messages
-            messages.forEachIndexed { index, mess ->
+            messages!!.forEachIndexed { index, mess ->
                 if (mess.id == message.id) {
-                    messages.set(index, message)
+                    messages[index] = message
                     adapter.notifyItemChanged(index)
                 }
             }
         })
-        viewModel.liveError.observe(viewLifecycleOwner, Observer { t ->
+        mViewModel.mLiveMessage.observe(activity!!, Observer { t ->
             mSrlContainer.isRefreshing = false
             toast(t)
         })
@@ -229,7 +226,7 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
             if (mSelectedMessage != null && mSelectedMessage!!.content != null && mCstReply.visibility == VISIBLE) {
                 reply = mSelectedMessage!!.content
             }
-            viewModel.pushMessage(userId, room, text, reply)
+            mViewModel.pushMessage(userId, room, text, reply)
             mEdtMessage.setText("")
         }
         //close reply box if need
@@ -238,13 +235,13 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
 
     override fun onItemSelected(item: Message, position: Int) {
         mSelectedMessage = item
-        optionsDialog.show(activity!!.supportFragmentManager, "dialog")
+        mOptionsDialog.show(activity!!.supportFragmentManager, "dialog")
     }
 
     override fun onReactionSelected(reaction: Int) {
         if (mSelectedMessage != null) {
             if (mSelectedMessage!!.userId != AppContext.userId) {
-                viewModel.changeReaction(mSelectedMessage!!, reaction)
+                mViewModel.changeReaction(mSelectedMessage!!, reaction)
 
             }
         }

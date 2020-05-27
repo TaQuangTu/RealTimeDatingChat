@@ -14,19 +14,19 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.taquangtu.forus.contexts.AppContext
-import com.taquangtu.forus.contexts.ForUsApplication
 import com.taquangtu.forus.activities.MainActivity
 import com.taquangtu.forus.broadcast.ServiceRestarter
+import com.taquangtu.forus.contexts.AppContext
+import com.taquangtu.forus.contexts.ForUsApplication
 import com.taquangtu.forus.models.Message
 
 
 class ListenMessageService : Service() {
-    private var hasDestroyed = false
+    private var mHasDestroyed = false
     private val mDatabaseRef =
         FirebaseDatabase.getInstance().reference.child("chats").child(AppContext.roomId)
             .limitToLast(1)
-    private val listener = object : ChildEventListener {
+    private val mListener = object : ChildEventListener {
         override fun onCancelled(p0: DatabaseError) {
         }
 
@@ -54,8 +54,8 @@ class ListenMessageService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        mDatabaseRef.addChildEventListener(listener)
-        hasDestroyed = false
+        mDatabaseRef.addChildEventListener(mListener)
+        mHasDestroyed = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             startMyOwnForeground()
         else
@@ -93,7 +93,7 @@ class ListenMessageService : Service() {
     }
 
     private fun startListening() {
-        mDatabaseRef.removeEventListener(listener)
+        mDatabaseRef.removeEventListener(mListener)
         val intent = Intent()
         intent.action = "restartservice"
         System.out.println("testtttt onTaskRemoved start service")
@@ -103,17 +103,17 @@ class ListenMessageService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        if (!hasDestroyed) {
+        if (!mHasDestroyed) {
             startListening()
-            hasDestroyed = true
+            mHasDestroyed = true
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (!hasDestroyed) {
+        if (!mHasDestroyed) {
             startListening()
-            hasDestroyed = true
+            mHasDestroyed = true
         }
     }
 

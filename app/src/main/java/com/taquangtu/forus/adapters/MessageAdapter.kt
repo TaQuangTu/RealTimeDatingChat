@@ -32,7 +32,7 @@ import java.text.SimpleDateFormat
 
 
 class MessageAdapter : RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
-    var messages = ArrayList<Message>()
+    var messages:ArrayList<Message>?  = ArrayList<Message>()
     lateinit var listener: ItemSelectionListener<Message>
 
     class ViewHolder : RecyclerView.ViewHolder {
@@ -64,7 +64,7 @@ class MessageAdapter : RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val mess = messages.get(position)
+        val mess = messages!![position]
         holder.tvContent.text = mess.content
         val formatter = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss")
         val time = formatter.format(mess.time)
@@ -139,13 +139,14 @@ class MessageAdapter : RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
         }
     }
 
-    fun setData(messages: ArrayList<Message>) {
+    fun setData(messages: ArrayList<Message>?) {
         this.messages = messages
         notifyDataSetChanged()
     }
 
     fun newMessage(message: Message) {
-        this.messages.add(message)
-        notifyItemInserted(messages.size - 1)
+        if(this.messages==null) this.messages = ArrayList()
+        this.messages!!.add(message)
+        notifyItemInserted(messages!!.size - 1)
     }
 }

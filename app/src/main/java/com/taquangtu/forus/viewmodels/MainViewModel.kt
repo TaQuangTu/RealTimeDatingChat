@@ -5,25 +5,28 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.taquangtu.forus.contexts.AppContext
 import com.taquangtu.forus.base.BaseViewModel
+import com.taquangtu.forus.contexts.AppContext
 import com.taquangtu.forus.helpers.TimeHelper
 import com.taquangtu.forus.models.Message
 import com.taquangtu.forus.models.Message.Companion.IMAGE_TAG
 import com.taquangtu.forus.models.Message.Companion.REACTION_NONE
 
 class MainViewModel : BaseViewModel() {
-    var mLoadedMessages = 50
-    var firebaseDataBase = FirebaseDatabase.getInstance()
-    var chatRef = firebaseDataBase.getReference("chats")
-    var liveData: MutableLiveData<ArrayList<Message>> = MutableLiveData()
-    var liveNewMess = MutableLiveData<Message>()
-    var liveItemChange = MutableLiveData<Message>()
+    var mFirebaseDataBase = FirebaseDatabase.getInstance()
+    var mChatRef = mFirebaseDataBase.getReference("chats")
+    var mLiveMessList: MutableLiveData<ArrayList<Message>> = MutableLiveData()
+    var mLiveNewMess = MutableLiveData<Message>()
+    var mLiveItemChange = MutableLiveData<Message>()
     fun loadMessages(loadMore: Boolean) {
-        chatRef.child(AppContext.roomId).limitToLast(mLoadedMessages)
+        var numMore = 0
+        if (loadMore) {
+            numMore += 50
+        }
+        mChatRef.child(AppContext.roomId).limitToLast(mLiveMessList.value?.size ?: 50 + numMore)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
-                    liveError.value = p0.message
+                    mLiveMessage.value = p0.message
                 }
 
                 override fun onDataChange(p0: DataSnapshot) {
@@ -32,46 +35,16 @@ class MainViewModel : BaseViewModel() {
                         var message = it.getValue(Message::class.java)
                         messagesList.add(message!!)
                     }
-                    liveData.value = messagesList
-                    if (loadMore)
-                        mLoadedMessages += 50
+                    mLiveMessList.value = messagesList
                 }
             })
     }
 
     fun listenNewMess() {
-        chatRef.child(AppContext.roomId).limitToLast(1)
+        mChatRef.child(AppContext.roomId).limitToLast(50)
             .addChildEventListener(object : ChildEventListener {
                 override fun onCancelled(p0: DatabaseError) {
-                    liveError.value = p0.message
-                }
-
-                override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-
-                }
-
-                override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-
-                }
-
-                override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-                    val mess = p0.getValue(Message::class.java)
-                    liveNewMess.value = mess
-                }
-
-                override fun onChildRemoved(p0: DataSnapshot) {
-
-                }
-
-            })
-    }
-
-    fun listenItemChange() {
-        var limitToListen = 200 //listen on change of 200 nearest items
-        chatRef.child(AppContext.roomId).limitToLast(limitToListen)
-            .addChildEventListener(object : ChildEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    liveError.value = p0.message
+                    mLiveMessage.value = p0.message
                 }
 
                 override fun onChildMoved(p0: DataSnapshot, p1: String?) {
@@ -80,11 +53,21 @@ class MainViewModel : BaseViewModel() {
 
                 override fun onChildChanged(p0: DataSnapshot, p1: String?) {
                     val mess = p0.getValue(Message::class.java)
-                    liveItemChange.value = mess
+                    mLiveItemChange.value = mess
                 }
 
                 override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-
+                    val mess = p0.getValue(Message::class.java)
+                    mLiveNewMess.value = mess
+                    if (mLiveMessList.value == null) {
+                        mLiveMessList.value = ArrayList()
+                    }
+                    for (i in mLiveMessList.value!!.size - 1 downTo 0) {
+                        if (mLiveMessList.value!![i].id.equals(mess!!.id)) {
+                            return
+                        }
+                    }
+                    mLiveMessList.value!!.add(mess!!)
                 }
 
                 override fun onChildRemoved(p0: DataSnapshot) {
@@ -97,9 +80,9 @@ class MainViewModel : BaseViewModel() {
     fun pushMessage(userId: String, room: Int, content: String, reply: String?) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
-        val key = chatRef.child(AppContext.roomId).push().key
+        val key = mChatRef.child(AppContext.roomId).push().key
         if (key == null) {
-            liveError.value = "No key to send message"
+            mLiveMessage.value = "No key to send message"
             return
         }
         val time = System.currentTimeMillis()
@@ -113,11 +96,11 @@ class MainViewModel : BaseViewModel() {
         val childUpdates = HashMap<String, Any>()
         childUpdates["$key"] = messageValues
 
-        chatRef.child(AppContext.roomId).updateChildren(childUpdates).addOnSuccessListener {
+        mChatRef.child(AppContext.roomId).updateChildren(childUpdates).addOnSuccessListener {
 
         }
             .addOnFailureListener {
-                liveError.value = it.localizedMessage
+                mLiveMessage.value = it.localizedMessage
             }
     }
 
@@ -127,11 +110,11 @@ class MainViewModel : BaseViewModel() {
 
         val childUpdates = HashMap<String, Any>()
         childUpdates["${mSelectedMessage.id}"] = messageValues
-        chatRef.child(AppContext.roomId).updateChildren(childUpdates).addOnSuccessListener {
+        mChatRef.child(AppContext.roomId).updateChildren(childUpdates).addOnSuccessListener {
 
         }
             .addOnFailureListener {
-                liveError.value = it.localizedMessage
+                mLiveMessage.value = it.localizedMessage
             }
     }
 
@@ -159,12 +142,12 @@ class MainViewModel : BaseViewModel() {
                 }
             }
             .addOnFailureListener {
-                liveError.value = it.localizedMessage
+                mLiveMessage.value = it.localizedMessage
             }
     }
 
     fun deleteOldMessages() {
-        chatRef.child(AppContext.roomId).orderByChild("time").limitToFirst(200)
+        mChatRef.child(AppContext.roomId).orderByChild("time").limitToFirst(200)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
 
@@ -181,7 +164,7 @@ class MainViewModel : BaseViewModel() {
         val time = System.currentTimeMillis()
         storage.reference.child("" + AppContext.roomId + "/images/$time").putFile(mImageUri!!)
             .addOnFailureListener {
-                liveError.value = it.localizedMessage
+                mLiveMessage.value = it.localizedMessage
             }.addOnSuccessListener {
 
             }.continueWithTask { task ->
@@ -199,9 +182,9 @@ class MainViewModel : BaseViewModel() {
                         IMAGE_TAG + task.result.toString(),
                         null
                     )
-                    liveError.value = "Wait for sending"
+                    mLiveMessage.value = "Wait for sending"
                 } else {
-                    liveError.value = "Fail when send image"
+                    mLiveMessage.value = "Fail when send image"
                 }
             }
     }

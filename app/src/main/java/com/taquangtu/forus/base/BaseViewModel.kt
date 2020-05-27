@@ -4,5 +4,5 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 open class BaseViewModel: ViewModel() {
-    open var liveError = MutableLiveData<String>()
+    open var mLiveMessage = MutableLiveData<String>() //for message or error
 }

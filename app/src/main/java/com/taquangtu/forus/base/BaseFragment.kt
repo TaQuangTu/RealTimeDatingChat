@@ -20,4 +20,7 @@ open class BaseFragment : Fragment() {
     fun toast(content:String?){
         Toast.makeText(context,content, Toast.LENGTH_SHORT).show()
     }
+    fun <T: View> findView(id:Int):T{
+        return view!!.findViewById(id)
+    }
 }
