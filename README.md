@@ -1,4 +1,4 @@
-**Note**: If you want to run this project, please re-setup Firebase sdk with your Firebase account, i don't provide Firebase pre-setup cause a few personal reasons.
+**Note**: If you want to run this project, please re-setup Firebase sdk with your Firebase account, i don't provide Firebase pre-setup cause a few personal reasons (An intruder has getten in my firebase database and got some personal information).
 
 # RealTimeDatingChat
 A real time chat app with firebase database, firebase storage<br>
