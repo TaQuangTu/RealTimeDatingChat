@@ -165,7 +165,6 @@ class MainFragment : BaseFragment(), View.OnClickListener, ItemSelectionListener
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activity!!.window.setBackgroundDrawableResource(R.drawable.bg)
         mViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         setUpViewModels()
         setUpRecyclerView()
